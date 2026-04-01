@@ -1,27 +1,32 @@
-# pixma-rs
+# Canon PIXMA G3010 Driver for macOS
 
-A pure Rust driver for Canon PIXMA G-series printers and scanners on macOS. No Canon drivers needed.
+**Print and scan with your Canon PIXMA G3010 on macOS — no Canon software needed.**
 
-This is the first open-source implementation of Canon's CHMP (Canon Home Management Protocol) scanning protocol, reverse-engineered from packet captures.
+Canon doesn't provide a macOS driver for the PIXMA G3010 (or most G-series printers). This project fixes that. It's an open-source driver that gives you full printing and scanning support on macOS Ventura, Sonoma, and Sequoia.
 
-## What it does
+Built in Rust. First open-source implementation of Canon's CHMP scanning protocol, reverse-engineered from network captures.
 
-- **Scanning** from Image Capture, Preview, or any macOS app that supports scanners
-- **Printing** from any app via IPP Everywhere
-- **CLI tools** for scanning and printing from the terminal
+## Features
 
-## Supported hardware
+- **Scanning** — works with Image Capture, Preview, and any macOS app that supports scanners
+- **Printing** — works from any app via IPP Everywhere (AirPrint-compatible)
+- **CLI** — scan and print from the terminal
+- **No Canon software** — fully standalone, no IJ Scan Utility or Canon drivers required
+- **Wi-Fi** — connects to your printer over the network
 
-- Canon PIXMA G3010 (tested)
-- Other Canon PIXMA G-series models likely work (same CHMP protocol)
+## Supported printers
 
-## How it works
+| Printer | Status |
+|---------|--------|
+| Canon PIXMA G3010 | Tested and working |
+| Canon PIXMA G2010, G4010, G3020, G2020 | Should work (same CHMP protocol) |
+| Other Canon PIXMA G-series | Likely compatible |
 
-Canon's G3010 doesn't support standard scan protocols (eSCL/AirScan) over Wi-Fi. It uses a proprietary HTTP-based protocol called CHMP on port 80.
+## Why this exists
 
-pixma-rs includes:
-- **pixma-bridge**: A daemon that translates between macOS's built-in eSCL (AirScan) scanner protocol and Canon's CHMP protocol. macOS sees it as a native AirScan scanner.
-- **pixma**: A CLI tool for scanning and printing directly.
+Canon's PIXMA G3010 only supports scanning via a proprietary protocol (CHMP) over Wi-Fi — it doesn't speak eSCL/AirScan, so macOS can't see it as a scanner. Canon's own IJ Scan Utility hasn't been updated for recent macOS versions and doesn't support Apple Silicon natively.
+
+This driver bridges the gap: it translates between macOS's native AirScan protocol and Canon's CHMP, so your G3010 scanner appears as a native device in Image Capture and Preview. Printing works out of the box via IPP Everywhere.
 
 ## Install
 
