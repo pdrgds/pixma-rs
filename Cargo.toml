@@ -1,0 +1,25 @@
+[workspace]
+members = [
+    "crates/pixma-protocol",
+    "crates/pixma-cli",
+    "crates/pixma-bridge",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/pdrgds/pixma-rs"
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+clap = { version = "4", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "time", "io-util"] }
+mdns-sd = "0.18"
+image = "0.25"
+ipp = { version = "5", features = ["client-tls"] }
+axum = "0.8"
+quick-xml = "0.37"
+uuid = { version = "1", features = ["v4"] }

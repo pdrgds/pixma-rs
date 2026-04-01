@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Discover Canon printer and register with CUPS for printing
+PRINTER_IP=$(/usr/local/bin/pixma discover 2>/dev/null | grep "IP:" | head -1 | awk '{print $2}')
+if [ -n "$PRINTER_IP" ]; then
+    lpadmin -p "Canon_G3010" -E -v "ipp://${PRINTER_IP}:631/ipp/print" -m everywhere 2>/dev/null
+fi
+
+# Install LaunchAgent
+mkdir -p /Library/LaunchAgents
+cp /usr/local/share/pixma/com.pdrgds.pixma-bridge.plist /Library/LaunchAgents/
+launchctl load /Library/LaunchAgents/com.pdrgds.pixma-bridge.plist 2>/dev/null
+
+exit 0

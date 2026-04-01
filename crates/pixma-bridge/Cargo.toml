@@ -1,0 +1,19 @@
+[package]
+name = "pixma-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "pixma-bridge"
+path = "src/main.rs"
+
+[dependencies]
+pixma-protocol = { path = "../pixma-protocol" }
+axum.workspace = true
+quick-xml.workspace = true
+uuid.workspace = true
+tokio.workspace = true
+mdns-sd.workspace = true
+anyhow.workspace = true
+hostname = "0.4"

@@ -1,0 +1,17 @@
+[package]
+name = "pixma-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "pixma"
+path = "src/main.rs"
+
+[dependencies]
+pixma-protocol = { path = "../pixma-protocol" }
+clap.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+ipp.workspace = true
+mdns-sd.workspace = true

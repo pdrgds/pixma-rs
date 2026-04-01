@@ -1,0 +1,12 @@
+[package]
+name = "pixma-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+tokio.workspace = true
+mdns-sd.workspace = true
+image.workspace = true
+hostname = "0.4"
