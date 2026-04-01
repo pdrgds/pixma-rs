@@ -1,3 +1,24 @@
+# Build
 /target
 *.pkg
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test artifacts
 test.jpg
+test.png
+*.scan.jpg
+*.scan.png
+
+# Captures (keep scan_trace.md, ignore raw captures people might add)
+docs/captures/*.pcap
+
+# Logs
+*.log
