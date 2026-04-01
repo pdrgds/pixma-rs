@@ -93,6 +93,12 @@ The `docs/` directory contains protocol notes from the reverse-engineering proce
 
 Produces `PixmaDriver-0.1.0.pkg`.
 
+## Legal
+
+This project was developed through clean-room reverse engineering of network
+traffic from a personally owned device, for the purpose of interoperability.
+No Canon proprietary software was decompiled or redistributed.
+
 ## License
 
 MIT OR Apache-2.0
