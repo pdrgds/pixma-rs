@@ -1,9 +1,29 @@
 #!/bin/bash
 
-# Discover Canon printer and register with CUPS for printing
-PRINTER_IP=$(/usr/local/bin/pixma discover 2>/dev/null | grep "IP:" | head -1 | awk '{print $2}')
-if [ -n "$PRINTER_IP" ]; then
-    lpadmin -p "Canon_G3010" -E -v "ipp://${PRINTER_IP}:631/ipp/print" -m everywhere 2>/dev/null
+# Discover Canon printer and register with CUPS for printing.
+#
+# Register using the printer's mDNS/Bonjour (dnssd://) device URI rather than a
+# static IP. A hardcoded IP breaks whenever DHCP reassigns the printer's address;
+# the dnssd name resolves to the current address on every job, the same way the
+# scan bridge discovers the device via mDNS.
+DEVICE_URI=""
+
+# Prefer the dnssd:// URI that CUPS itself discovers via Bonjour.
+for attempt in 1 2 3 4 5; do
+    DEVICE_URI=$(lpinfo -v 2>/dev/null | awk '/dnssd:\/\// && /[Cc]anon/ {print $2; exit}')
+    [ -n "$DEVICE_URI" ] && break
+    sleep 2
+done
+
+# Fall back to a static IP from our own mDNS discovery if CUPS did not surface a
+# dnssd URI (e.g. Bonjour blocked). Less robust against DHCP changes.
+if [ -z "$DEVICE_URI" ]; then
+    PRINTER_IP=$(/usr/local/bin/pixma discover 2>/dev/null | grep "IP:" | head -1 | awk '{print $2}')
+    [ -n "$PRINTER_IP" ] && DEVICE_URI="ipp://${PRINTER_IP}:631/ipp/print"
+fi
+
+if [ -n "$DEVICE_URI" ]; then
+    lpadmin -p "Canon_G3010" -E -v "$DEVICE_URI" -m everywhere 2>/dev/null
 fi
 
 # Install LaunchAgent
