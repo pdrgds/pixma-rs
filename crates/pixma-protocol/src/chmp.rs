@@ -5,11 +5,18 @@
 //! retrieved with a subsequent GET. Both use `application/octet-stream`.
 
 use std::net::IpAddr;
+use std::time::Duration;
 
 use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 
 use crate::error::PixmaError;
+
+/// Maximum time to wait for a single POST+GET exchange with the printer.
+/// The printer may legitimately hold a GET open up to its advertised
+/// X-CHMP-Timeout (20s), so this sits comfortably above that. Without it a
+/// stalled read on the underlying stream would block forever.
+const EXCHANGE_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// A CHMP HTTP connection to a Canon scanner.
 pub struct ChmpConnection {
@@ -33,7 +40,18 @@ impl ChmpConnection {
     }
 
     /// Send data via HTTP POST, then receive response via HTTP GET.
+    ///
+    /// Bounded by `EXCHANGE_TIMEOUT` so a stalled printer surfaces a timeout
+    /// error instead of blocking forever (the underlying stream has no
+    /// socket-level read timeout).
     pub async fn exchange(&mut self, data: &[u8]) -> Result<Vec<u8>, PixmaError> {
+        match tokio::time::timeout(EXCHANGE_TIMEOUT, self.exchange_inner(data)).await {
+            Ok(result) => result,
+            Err(_elapsed) => Err(PixmaError::Timeout),
+        }
+    }
+
+    async fn exchange_inner(&mut self, data: &[u8]) -> Result<Vec<u8>, PixmaError> {
         self.post(data).await?;
         self.get().await
     }
@@ -150,11 +168,5 @@ impl ChmpConnection {
         }
 
         Ok(body)
-    }
-
-    /// Perform the 1-byte handshake that starts a CHMP session.
-    pub async fn handshake(&mut self) -> Result<(), PixmaError> {
-        let _resp = self.exchange(&[0x00]).await?;
-        Ok(())
     }
 }
