@@ -137,12 +137,16 @@ pub async fn scan(
         let scan_status = resp[8];
         eprintln!("[scan]    status byte[8] = 0x{scan_status:02x}");
         match scan_status {
-            0x03 => break,               // data ready
-            0x00 | 0x02 => continue,     // idle / scanning+calibrating
+            0x03 => break,                      // data ready
+            0x00 | 0x01 | 0x02 => continue,     // idle / preparing / scanning+calibrating
+            // The reference capture only ever showed 0x00/0x02/0x03, but the real
+            // G3010 also passes through 0x01 (and possibly other transient states)
+            // mid-scan. Treating an unknown poll byte as fatal was itself a bug —
+            // it failed the scan whenever the 500ms poll happened to sample 0x01.
+            // Keep polling instead; a genuine stall is caught by STATUS_POLL_TIMEOUT.
             other => {
-                return Err(PixmaError::Protocol(format!(
-                    "unexpected status byte during poll: 0x{other:02x}"
-                )));
+                eprintln!("[scan]    (unexpected status 0x{other:02x} — treating as in-progress)");
+                continue;
             }
         }
     }
